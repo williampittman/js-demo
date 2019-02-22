@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <script src="https://www.paypal.com/sdk/js?client-id=Af_OpabuECsNfU6AzLf1PT213b3BGAy6CRJa5IEr3hteYlOFobgeo0D9gTXxgH4l4UjyhJplVW2xaGVO"></script>
+  </head>
+  <body>
+    <div class="container mt-3">
+      <div class="row">
+        <h1>Upgrade from NVP Integration</h1>
+      </div>
+      <div class="row mt-5">
+        <div class="col-md-6">
+          <div id="paypal-button" style="width: 60%"></div>
+        </div>
+        <div class="col-md-6" id="ec-output"></div>
+      </div>
+    </div>
+    <!--container-->
+
+    <script>
+      paypal
+        .Buttons({
+          createOrder: () => {
+            let SETEC_URL = "set_ec";
+            return fetch(SETEC_URL, {
+              method: "post"
+            })
+              .then(res => res.json())
+              .then(data => data.token);
+          },
+          onApprove: (data, actions) => {
+            let paymentInfo = {
+              orderID: data.orderID,
+              payerID: data.payerID
+            };
+
+            //Can either redirect here or call DOEC directly from onApprove()
+            //ex. actions.redirect('your url here');
+            let DOEC_URL = "do_ec";
+            console.log(JSON.stringify(paymentInfo));
+            return fetch(DOEC_URL, {
+              method: "POST",
+              body: JSON.stringify(paymentInfo),
+              headers: {
+                "Content-Type": "application/json"
+              }
+            })
+              .then(response => response.json())
+              .then(data => {
+                let output = "";
+                for (let i in data.arr) {
+                  output += data.arr[i] + "\n";
+                  console.log(output);
+                }
+                document.querySelector("#ec-output").innerHTML = output;
+              });
+          }
+        })
+        .render("#paypal-button");
+    </script>
+
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
