@@ -16,6 +16,6 @@ clone this repository and navigate to the new directory
 
 - you must input your credentials in the config file, as well as add your client_id to the script tags
 
-  - in your terminal, type 'npm run dev'
+  - in your terminal, type 'npm install' and once complete, type 'npm run dev'
 
 open a browser, and go to localhost:5000
