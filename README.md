@@ -13,6 +13,9 @@ npm and node.js installed on your machine
 # to run:
 
 clone this repository and navigate to the new directory
+
+- you must input your credentials in the config file, as well as add your client_id to the script tags
+
   - in your terminal, type 'npm run dev'
-  
+
 open a browser, and go to localhost:5000
