@@ -13,9 +13,54 @@
   </head>
   <body>
     <div class="container mt-3">
-      <h1>Payments</h1>
+      <div class="row">
+        <h1>Upgrade from v1 Payments</h1>
+      </div>
+      <div class="row mt-5">
+        <div class="col-md-6">
+          <div id="paypal-button" style="width: 60%"></div>
+        </div>
+        <div class="col-md-6" id="payments-output"></div>
+      </div>
     </div>
     <!--container-->
+
+    <script>
+      paypal
+        .Buttons({
+          createOrder: () => {
+            const CREATE_PAYMENT_URL = "create_payment";
+            return fetch(CREATE_PAYMENT_URL, {
+              method: "POST"
+            })
+              .then(res => res.json())
+              .then(data => data.token);
+          },
+          onApprove: (data, actions) => {
+            const EXECUTE_PAYMENT_URL = "execute_payment";
+            console.log(data);
+            let paymentInfo = {
+              payerID: data.payerID,
+              paymentID: data.paymentID
+            };
+
+            return fetch(EXECUTE_PAYMENT_URL, {
+              method: "POST",
+              body: JSON.stringify(paymentInfo),
+              headers: {
+                "Content-Type": "application/json"
+              }
+            })
+              .then(response => response.json())
+              .then(data => {
+                document.querySelector(
+                  "#payments-output"
+                ).innerHTML = JSON.stringify(data.payment, null, 2);
+              });
+          }
+        })
+        .render("#paypal-button");
+    </script>
 
     <script
       src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
