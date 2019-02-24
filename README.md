@@ -57,12 +57,83 @@ open a browser, and go to localhost:5000
                 for (let i in data.arr) {
                   output += data.arr[i] + "\n";
                 }
-                console.log(output);
-                document.querySelector("#ec-output").innerHTML = output;
+                alert(output);
               });
           }
         })
         .render("#paypal-button");
     </script>
-    ```
-    
+```
+
+# /v1/payments integration: 
+
+```
+<script>
+      paypal
+        .Buttons({
+          createOrder: () => {
+            const CREATE_PAYMENT_URL = "create_payment";
+            return fetch(CREATE_PAYMENT_URL, {
+              method: "POST"
+            })
+              .then(res => res.json())
+              .then(data => data.token);
+          },
+          onApprove: (data, actions) => {
+            const EXECUTE_PAYMENT_URL = "execute_payment";
+            console.log(data);
+            let paymentInfo = {
+              payerID: data.payerID,
+              paymentID: data.paymentID
+            };
+
+            return fetch(EXECUTE_PAYMENT_URL, {
+              method: "POST",
+              body: JSON.stringify(paymentInfo),
+              headers: {
+                "Content-Type": "application/json"
+              }
+            })
+              .then(response => response.json())
+              .then(data => {
+                alert(data.payment);
+              });
+          }
+        })
+        .render("#paypal-button");
+    </script>
+```
+
+# /v1/billing-agreements/agreement-tokens
+
+```
+<script>
+      paypal
+        .Buttons({
+          createBillingAgreement: () => {
+            let CREATE_BA_TOKEN_URL = "create_ba_token";
+            return fetch(CREATE_BA_TOKEN_URL, {
+              method: "post"
+            })
+              .then(res => res.json())
+              .then(data => data.billingToken);
+          },
+          onApprove: data => {
+            let FINALIZE_BA_URL = "finalize_ba";
+
+            return fetch(FINALIZE_BA_URL, {
+              method: "POST",
+              body: JSON.stringify({ billingToken: data.billingToken }),
+              headers: {
+                "Content-Type": "application/json"
+              }
+            })
+              .then(response => response.json())
+              .then(data => {
+                alert(data.billingAgreement);
+              });
+          }
+        })
+        .render("#paypal-button");
+    </script>
+```
