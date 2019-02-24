@@ -19,3 +19,50 @@ clone this repository and navigate to the new directory
   - in your terminal, type 'npm install' and once complete, type 'npm run dev'
 
 open a browser, and go to localhost:5000
+
+# NVP integration:
+
+```
+<script>
+      paypal
+        .Buttons({
+          createOrder: () => {
+            let SETEC_URL = "set_ec";
+            return fetch(SETEC_URL, {
+              method: "post"
+            })
+              .then(res => res.json())
+              .then(data => data.token);
+          },
+          onApprove: (data, actions) => {
+            let paymentInfo = {
+              orderID: data.orderID,
+              payerID: data.payerID
+            };
+
+            //Can either redirect here or call DOEC directly from onApprove()
+            //ex. actions.redirect('your url here');
+            let DOEC_URL = "do_ec";
+            console.log(JSON.stringify(paymentInfo));
+            return fetch(DOEC_URL, {
+              method: "POST",
+              body: JSON.stringify(paymentInfo),
+              headers: {
+                "Content-Type": "application/json"
+              }
+            })
+              .then(response => response.json())
+              .then(data => {
+                let output = "";
+                for (let i in data.arr) {
+                  output += data.arr[i] + "\n";
+                }
+                console.log(output);
+                document.querySelector("#ec-output").innerHTML = output;
+              });
+          }
+        })
+        .render("#paypal-button");
+    </script>
+    ```
+    
